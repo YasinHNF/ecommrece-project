@@ -6,6 +6,8 @@ function Orders() {
     return (
         <>
             <title>Orders</title>
+            <link rel="icon" type="image/png" href="/images/orders-favicon.png" />
+
             <Header />
             <div className="orders-page">
                 <div className="page-title">Your Orders</div>

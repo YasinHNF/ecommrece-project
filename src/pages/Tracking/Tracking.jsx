@@ -6,6 +6,8 @@ function Tracking() {
     return (
         <>
             <title>Tracking</title>
+            <link rel="icon" type="image/png" href="/images/tracking-favicon.png" />
+
             <Header />
             <div className="tracking-page">
                 <div className="order-tracking">

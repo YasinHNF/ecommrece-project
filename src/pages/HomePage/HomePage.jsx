@@ -5,6 +5,8 @@ function HomePage() {
     return (
         <>
             <title>Ecommerce Project</title>
+            <link rel="icon" type="image/png" href="/images/home-favicon.png" />
+
             <Header />
             <div className="home-page">
                 <div className="products-grid">
