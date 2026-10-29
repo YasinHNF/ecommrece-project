@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { useState, useEffect } from 'react'
 import Header from '../../components/Header/Header';
 import checkmark from '../../assets/images/icons/checkmark.png'
@@ -8,9 +9,8 @@ function HomePage() {
     useEffect(
         () => {
             async function getData() {
-                const rawProducts = await fetch('http://localhost:3000/api/products');
-                const jsonProducts = await rawProducts.json();
-                setData(jsonProducts);
+                const response = await axios.get('http://localhost:3000/api/products');
+                setData(response.data);
             }
             getData();
         }, []
