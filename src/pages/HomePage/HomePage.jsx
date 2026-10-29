@@ -4,9 +4,8 @@ import Header from '../../components/Header/Header';
 import checkmark from '../../assets/images/icons/checkmark.png'
 import './HomePage.css'
 
-function HomePage() {
+function HomePage(cart) {
     const [products, setProducts] = useState([]);
-    const [cart, setCart] = useState([]);
 
     useEffect(
         () => {
@@ -16,12 +15,6 @@ function HomePage() {
             }
             getProducts();
 
-            async function getCart() {
-                const response = await axios.get('/api/cart-items');
-                setCart(response.data);
-            }
-
-            getCart();
         }, []
     )
 
@@ -32,6 +25,7 @@ function HomePage() {
             <link rel="icon" type="image/png" href="/images/home-favicon.png" />
 
             <Header cartCount={cart.length} />
+
             <div className="home-page">
                 <div className="products-grid">
                     {

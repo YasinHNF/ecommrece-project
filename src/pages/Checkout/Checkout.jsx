@@ -5,7 +5,7 @@ import lockIcon from '../../assets/images/icons/checkout-lock-icon.png'
 import './Checkout.css'
 import './Checkout-header.css'
 
-function CheckoutHeader() {
+function CheckoutHeader({ cartLength }) {
     return (
         <div className="checkout-header">
             <div className="header-content">
@@ -18,7 +18,7 @@ function CheckoutHeader() {
 
                 <div className="checkout-header-middle-section">
                     Checkout (<Link className="return-to-home-link"
-                        to="/">3 items</Link>)
+                        to="/">{cartLength} items</Link>)
                 </div>
 
                 <div className="checkout-header-right-section">
@@ -29,13 +29,13 @@ function CheckoutHeader() {
     );
 }
 
-function Checkout() {
+function Checkout({ cart }) {
     return (
         <>
             <title>Checkout</title>
             <link rel="icon" type="image/png" href="/images/cart-favicon.png" />
 
-            <CheckoutHeader />
+            <CheckoutHeader cartLength={cart.length} />
             <div className="checkout-page">
                 <div className="page-title">Review your order</div>
 
