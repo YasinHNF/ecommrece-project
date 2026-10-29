@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import Header from '../../components/Header/header';
+import Header from '../../components/Header/Header';
 import buyAgain from '../../assets/images/icons/buy-again.png'
 import './Orders.css'
 

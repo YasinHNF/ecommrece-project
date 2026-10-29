@@ -1,4 +1,4 @@
-import Header from '../../components/Header/header';
+import Header from '../../components/Header/Header';
 import checkmark from '../../assets/images/icons/checkmark.png'
 import './HomePage.css'
 
