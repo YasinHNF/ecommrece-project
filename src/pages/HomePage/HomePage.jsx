@@ -11,13 +11,13 @@ function HomePage() {
     useEffect(
         () => {
             async function getProducts() {
-                const response = await axios.get('http://localhost:3000/api/products');
+                const response = await axios.get('/api/products');
                 setProducts(response.data);
             }
             getProducts();
 
             async function getCart() {
-                const response = await axios.get('http://localhost:3000/api/cart-items');
+                const response = await axios.get('/api/cart-items');
                 setCart(response.data);
             }
 
