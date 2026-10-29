@@ -5,14 +5,23 @@ import checkmark from '../../assets/images/icons/checkmark.png'
 import './HomePage.css'
 
 function HomePage() {
-    const [data, setData] = useState([]);
+    const [products, setProducts] = useState([]);
+    const [cart, setCart] = useState([]);
+
     useEffect(
         () => {
-            async function getData() {
+            async function getProducts() {
                 const response = await axios.get('http://localhost:3000/api/products');
-                setData(response.data);
+                setProducts(response.data);
             }
-            getData();
+            getProducts();
+
+            async function getCart() {
+                const response = await axios.get('http://localhost:3000/api/cart-items');
+                setCart(response.data);
+            }
+
+            getCart();
         }, []
     )
 
@@ -22,11 +31,11 @@ function HomePage() {
             <title>Ecommerce Project</title>
             <link rel="icon" type="image/png" href="/images/home-favicon.png" />
 
-            <Header />
+            <Header cartCount={cart.length} />
             <div className="home-page">
                 <div className="products-grid">
                     {
-                        data.map(
+                        products.map(
                             productItem => {
                                 return (
                                     <div key={productItem.id} className="product-container">
@@ -80,7 +89,6 @@ function HomePage() {
                                 )
                             }
                         )
-
                     }
                 </div>
             </div>

@@ -5,7 +5,7 @@ import cartIcon from '../../assets/images/icons/cart-icon.png'
 import searchIcon from '../../assets/images/icons/search-icon.png'
 import './Header.css'
 
-function Header() {
+function Header({ cartCount }) {
     return (
         <div className="header">
             <div className="left-section">
@@ -33,7 +33,7 @@ function Header() {
 
                 <NavLink className="cart-link header-link" to="/checkout">
                     <img className="cart-icon" src={cartIcon} />
-                    <div className="cart-quantity">3</div>
+                    <div className="cart-quantity">{cartCount}</div>
                     <div className="cart-text">Cart</div>
                 </NavLink>
             </div>
