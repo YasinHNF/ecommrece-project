@@ -1,9 +1,22 @@
+import { useState, useEffect } from 'react'
 import Header from '../../components/Header/Header';
 import checkmark from '../../assets/images/icons/checkmark.png'
-import { products } from '../../data/products.js';
 import './HomePage.css'
 
 function HomePage() {
+    const [data, setData] = useState([]);
+    useEffect(
+        () => {
+            async function getData() {
+                const rawProducts = await fetch('http://localhost:3000/api/products');
+                const jsonProducts = await rawProducts.json();
+                setData(jsonProducts);
+            }
+            getData();
+        }, []
+    )
+
+
     return (
         <>
             <title>Ecommerce Project</title>
@@ -13,7 +26,7 @@ function HomePage() {
             <div className="home-page">
                 <div className="products-grid">
                     {
-                        products.map(
+                        data.map(
                             productItem => {
                                 return (
                                     <div key={productItem.id} className="product-container">
@@ -67,6 +80,7 @@ function HomePage() {
                                 )
                             }
                         )
+
                     }
                 </div>
             </div>
