@@ -1,24 +1,9 @@
-import axios from 'axios'
-import { useState, useEffect } from 'react'
 import Header from '../../components/Header/Header';
+import { formatPriceCents } from '../../utils/formatPrice.js';
 import checkmark from '../../assets/images/icons/checkmark.png'
 import './HomePage.css'
 
-function HomePage(cart) {
-    const [products, setProducts] = useState([]);
-
-    useEffect(
-        () => {
-            async function getProducts() {
-                const response = await axios.get('/api/products');
-                setProducts(response.data);
-            }
-            getProducts();
-
-        }, []
-    )
-
-
+function HomePage({ cart, products }) {
     return (
         <>
             <title>Ecommerce Project</title>
@@ -51,7 +36,7 @@ function HomePage(cart) {
                                         </div>
 
                                         <div className="product-price">
-                                            ${(productItem.priceCents / 100).toFixed(2)}
+                                            ${formatPriceCents(productItem.priceCents)}
                                         </div>
 
                                         <div className="product-quantity-container">

@@ -8,6 +8,7 @@ import Tracking from './pages/Tracking/Tracking'
 import NotFound from './pages/NotFound/NotFound'
 
 function App() {
+  const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
 
   useEffect(
@@ -16,14 +17,22 @@ function App() {
         const response = await axios.get('/api/cart-items');
         setCart(response.data);
       }
+
       getCart();
-    }
+
+      async function getProducts() {
+        const response = await axios.get('/api/products');
+        setProducts(response.data);
+      }
+
+      getProducts();
+    }, []
   );
 
   return (
     <Routes>
-      <Route index element={<HomePage cart={cart} setCart={setCart} />} />
-      <Route path="checkout" element={<Checkout cart={cart} />} />
+      <Route index element={<HomePage cart={cart} products={products} />} />
+      <Route path="checkout" element={<Checkout cart={cart} products={products} />} />
       <Route path="orders" element={<Orders />} />
       <Route path="tracking" element={<Tracking />} />
       <Route path="*" element={<NotFound />} />
