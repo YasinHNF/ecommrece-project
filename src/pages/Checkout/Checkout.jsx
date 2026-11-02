@@ -45,18 +45,20 @@ function Checkout({ cart, products, setCart }) {
                 updatedCartItem.data.deliveryOptionId;
             setCart(editedCart);
 
-            console.log(cart)
         } catch (error) {
             alert(`Error : ${error}`);
         }
     }
 
     const [deliveryOptions, setDeliveryOptions] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+
     useEffect(
         () => {
             async function getDeliveryOptions() {
                 const response = await axios.get('/api/delivery-options');
                 setDeliveryOptions(response.data);
+                setIsLoading(false);
             }
 
             getDeliveryOptions();
@@ -83,110 +85,112 @@ function Checkout({ cart, products, setCart }) {
                 <div className="checkout-grid">
                     <div className="order-summary">
                         {
-                            cart.map(
-                                cartItem => {
-                                    const product = products.find(productItem => productItem.id === cartItem.productId);
+                            isLoading ? <p>Loading...</p> :
+                                cart.map(
+                                    cartItem => {
+                                        const product = products.find(productItem => productItem.id === cartItem.productId);
 
-                                    return (<div key={cartItem.productId} className="cart-item-container">
-                                        <div className="delivery-date">
-                                            Delivery date: {dayjs(cartItem.createdAt).format('dddd, MMMM DD')}
-                                        </div>
-
-                                        <div className="cart-item-details-grid">
-                                            <img className="product-image"
-                                                src={product?.image} />
-
-                                            <div className="cart-item-details">
-                                                <div className="product-name">
-                                                    {
-                                                        product?.name
-                                                    }
-                                                </div>
-                                                <div className="product-price">
-                                                    ${formatPriceCents(product?.priceCents)}
-                                                </div>
-                                                <div className="product-quantity">
-                                                    <span>
-                                                        Quantity: <span className="quantity-label">{cartItem?.quanttiy}</span>
-                                                    </span>
-                                                    <span className="update-quantity-link link-primary">
-                                                        Update
-                                                    </span>
-                                                    <span className="delete-quantity-link link-primary">
-                                                        Delete
-                                                    </span>
-                                                </div>
+                                        return (<div key={cartItem.productId} className="cart-item-container">
+                                            <div className="delivery-date">
+                                                {console.log(deliveryOptions)}
+                                                Delivery date: {dayjs().add((deliveryOptions.find(delOption => delOption.id === cartItem.deliveryOptionId)).deliveryDays, 'days').format('dddd, MMMM DD')}
                                             </div>
 
-                                            <div className="delivery-options">
-                                                <div className="delivery-options-title">
-                                                    Choose a delivery option:
-                                                </div>
-                                                <div className="delivery-option">
-                                                    <input type="radio"
-                                                        className="delivery-option-input"
-                                                        name={`delivery-option-${product?.id}`}
-                                                        value="1"
-                                                        onChange={
-                                                            () => {
-                                                                updateDeliveryOption(product?.id, '1');
-                                                            }
+                                            <div className="cart-item-details-grid">
+                                                <img className="product-image"
+                                                    src={product?.image} />
+
+                                                <div className="cart-item-details">
+                                                    <div className="product-name">
+                                                        {
+                                                            product?.name
                                                         }
-                                                        checked={cartItem?.deliveryOptionId === '1'} />
-                                                    <div>
-                                                        <div className="delivery-option-date">
-                                                            Tuesday, June 21
-                                                        </div>
-                                                        <div className="delivery-option-price">
-                                                            FREE Shipping
-                                                        </div>
+                                                    </div>
+                                                    <div className="product-price">
+                                                        ${formatPriceCents(product?.priceCents)}
+                                                    </div>
+                                                    <div className="product-quantity">
+                                                        <span>
+                                                            Quantity: <span className="quantity-label">{cartItem?.quantity}</span>
+                                                        </span>
+                                                        <span className="update-quantity-link link-primary">
+                                                            Update
+                                                        </span>
+                                                        <span className="delete-quantity-link link-primary">
+                                                            Delete
+                                                        </span>
                                                     </div>
                                                 </div>
-                                                <div className="delivery-option">
-                                                    <input type="radio"
-                                                        className="delivery-option-input"
-                                                        name={`delivery-option-${product?.id}`}
-                                                        value="2"
-                                                        onChange={
-                                                            () => {
-                                                                updateDeliveryOption(product?.id, '2');
+
+                                                <div className="delivery-options">
+                                                    <div className="delivery-options-title">
+                                                        Choose a delivery option:
+                                                    </div>
+                                                    <div className="delivery-option">
+                                                        <input type="radio"
+                                                            className="delivery-option-input"
+                                                            name={`delivery-option-${product?.id}`}
+                                                            value="1"
+                                                            onChange={
+                                                                () => {
+                                                                    updateDeliveryOption(product?.id, '1');
+                                                                }
                                                             }
-                                                        }
-                                                        checked={cartItem?.deliveryOptionId === '2'} />
-                                                    <div>
-                                                        <div className="delivery-option-date">
-                                                            Wednesday, June 15
-                                                        </div>
-                                                        <div className="delivery-option-price">
-                                                            $4.99 - Shipping
+                                                            checked={cartItem?.deliveryOptionId === '1'} />
+                                                        <div>
+                                                            <div className="delivery-option-date">
+                                                                Tuesday, June 21
+                                                            </div>
+                                                            <div className="delivery-option-price">
+                                                                FREE Shipping
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div className="delivery-option">
-                                                    <input type="radio"
-                                                        className="delivery-option-input"
-                                                        name={`delivery-option-${product?.id}`}
-                                                        value="3"
-                                                        onChange={
-                                                            () => {
-                                                                updateDeliveryOption(product.id, '3');
+                                                    <div className="delivery-option">
+                                                        <input type="radio"
+                                                            className="delivery-option-input"
+                                                            name={`delivery-option-${product?.id}`}
+                                                            value="2"
+                                                            onChange={
+                                                                () => {
+                                                                    updateDeliveryOption(product?.id, '2');
+                                                                }
                                                             }
-                                                        }
-                                                        checked={cartItem?.deliveryOptionId === '3'} />
-                                                    <div>
-                                                        <div className="delivery-option-date">
-                                                            Monday, June 13
+                                                            checked={cartItem?.deliveryOptionId === '2'} />
+                                                        <div>
+                                                            <div className="delivery-option-date">
+                                                                Wednesday, June 15
+                                                            </div>
+                                                            <div className="delivery-option-price">
+                                                                $4.99 - Shipping
+                                                            </div>
                                                         </div>
-                                                        <div className="delivery-option-price">
-                                                            $9.99 - Shipping
+                                                    </div>
+                                                    <div className="delivery-option">
+                                                        <input type="radio"
+                                                            className="delivery-option-input"
+                                                            name={`delivery-option-${product?.id}`}
+                                                            value="3"
+                                                            onChange={
+                                                                () => {
+                                                                    updateDeliveryOption(product.id, '3');
+                                                                }
+                                                            }
+                                                            checked={cartItem?.deliveryOptionId === '3'} />
+                                                        <div>
+                                                            <div className="delivery-option-date">
+                                                                Monday, June 13
+                                                            </div>
+                                                            <div className="delivery-option-price">
+                                                                $9.99 - Shipping
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>)
-                                }
-                            )
+                                        </div>)
+                                    }
+                                )
                         }
 
                     </div>
