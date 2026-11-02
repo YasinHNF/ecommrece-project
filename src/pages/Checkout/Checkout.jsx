@@ -33,6 +33,61 @@ function CheckoutHeader({ cartLength }) {
     );
 }
 
+function PaymentSummary({ cart }) {
+    const [paymentSummary, setPaymentSummary] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        async function getPaymentSummary() {
+            const response = await axios.get('/api/payment-summary');
+            setPaymentSummary(response.data);
+            setIsLoading(false);
+        }
+
+        getPaymentSummary();
+    }, [cart]);
+
+    return (
+        isLoading ? (
+            <p>Loading</p>
+        ) : (
+            <div className="payment-summary">
+                <div className="payment-summary-title">
+                    Payment Summary
+                </div>
+
+                <div className="payment-summary-row">
+                    <div>Items ({paymentSummary.totalItems}):</div>
+                    <div className="payment-summary-money">${formatPriceCents(paymentSummary.productCostCents)}</div>
+                </div>
+
+                <div className="payment-summary-row">
+                    <div>Shipping &amp; handling:</div>
+                    <div className="payment-summary-money">${formatPriceCents(paymentSummary.shippingCostCents || '0.00')}</div>
+                </div>
+
+                <div className="payment-summary-row subtotal-row">
+                    <div>Total before tax:</div>
+                    <div className="payment-summary-money">${formatPriceCents(paymentSummary.totalCostBeforeTaxCents)}</div>
+                </div>
+
+                <div className="payment-summary-row">
+                    <div>Estimated tax (10%):</div>
+                    <div className="payment-summary-money">${formatPriceCents(paymentSummary.taxCents)}</div>
+                </div>
+
+                <div className="payment-summary-row total-row">
+                    <div>Order total:</div>
+                    <div className="payment-summary-money">${formatPriceCents(paymentSummary.totalCostCents)}</div>
+                </div>
+
+                <button className="place-order-button button-primary">
+                    Place your order
+                </button>
+            </div>)
+    )
+}
+
 function Checkout({ cart, products, setCart }) {
     async function updateDeliveryOption(productId, optionId) {
         if (!productId) return
@@ -51,14 +106,14 @@ function Checkout({ cart, products, setCart }) {
     }
 
     const [deliveryOptions, setDeliveryOptions] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoadingProducts, setIsLoadingProducts] = useState(true);
 
     useEffect(
         () => {
             async function getDeliveryOptions() {
                 const response = await axios.get('/api/delivery-options');
                 setDeliveryOptions(response.data);
-                setIsLoading(false);
+                setIsLoadingProducts(false);
             }
 
             getDeliveryOptions();
@@ -85,14 +140,13 @@ function Checkout({ cart, products, setCart }) {
                 <div className="checkout-grid">
                     <div className="order-summary">
                         {
-                            isLoading ? <p>Loading...</p> :
+                            isLoadingProducts ? <p>Loading...</p> :
                                 cart.map(
                                     cartItem => {
                                         const product = products.find(productItem => productItem.id === cartItem.productId);
 
                                         return (<div key={cartItem.productId} className="cart-item-container">
                                             <div className="delivery-date">
-                                                {console.log(deliveryOptions)}
                                                 Delivery date: {dayjs().add((deliveryOptions.find(delOption => delOption.id === cartItem.deliveryOptionId)).deliveryDays, 'days').format('dddd, MMMM DD')}
                                             </div>
 
@@ -195,40 +249,7 @@ function Checkout({ cart, products, setCart }) {
 
                     </div>
 
-                    <div className="payment-summary">
-                        <div className="payment-summary-title">
-                            Payment Summary
-                        </div>
-
-                        <div className="payment-summary-row">
-                            <div>Items ({cart.length}):</div>
-                            <div className="payment-summary-money">${formatPriceCents(productsPrice)}</div>
-                        </div>
-
-                        <div className="payment-summary-row">
-                            <div>Shipping &amp; handling:</div>
-                            <div className="payment-summary-money">${formatPriceCents(shippingPrice)}</div>
-                        </div>
-
-                        <div className="payment-summary-row subtotal-row">
-                            <div>Total before tax:</div>
-                            <div className="payment-summary-money">${formatPriceCents(productsPrice + shippingPrice)}</div>
-                        </div>
-
-                        <div className="payment-summary-row">
-                            <div>Estimated tax (10%):</div>
-                            <div className="payment-summary-money">${formatPriceCents(taxPrice)}</div>
-                        </div>
-
-                        <div className="payment-summary-row total-row">
-                            <div>Order total:</div>
-                            <div className="payment-summary-money">${formatPriceCents(productsPrice + shippingPrice + taxPrice)}</div>
-                        </div>
-
-                        <button className="place-order-button button-primary">
-                            Place your order
-                        </button>
-                    </div>
+                    <PaymentSummary cart={cart} />
                 </div>
             </div>
 
