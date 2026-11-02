@@ -1,4 +1,6 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router'
+import axios from 'axios'
 import dayjs from 'dayjs'
 import { formatPriceCents } from '../../utils/formatPrice.js'
 import logo from '../../assets/images/logo.png'
@@ -31,9 +33,38 @@ function CheckoutHeader({ cartLength }) {
     );
 }
 
-function Checkout({ cart, products }) {
+function Checkout({ cart, products, setCart }) {
+    async function updateDeliveryOption(productId, optionId) {
+        if (!productId) return
+
+        try {
+            const updatedCartItem = await axios.put(`/api/cart-items/${productId}`, { deliveryOptionId: optionId });
+
+            const editedCart = structuredClone(cart);
+            editedCart.find(cartItem => cartItem.productId === updatedCartItem.data.productId).deliveryOptionId =
+                updatedCartItem.data.deliveryOptionId;
+            setCart(editedCart);
+
+            console.log(cart)
+        } catch (error) {
+            alert(`Error : ${error}`);
+        }
+    }
+
+    const [deliveryOptions, setDeliveryOptions] = useState(null);
+    useEffect(
+        () => {
+            async function getDeliveryOptions() {
+                const response = await axios.get('/api/delivery-options');
+                setDeliveryOptions(response.data);
+            }
+
+            getDeliveryOptions();
+        }, []
+    );
+
     const productsPrice = cart.reduce(
-        (priceSum, cartItem) => priceSum + (cartItem.quantity * (products.find(productItem => productItem.id === cartItem.productId)).priceCents),
+        (priceSum, cartItem) => priceSum + (cartItem.quantity * (products.find(productItem => productItem.id === cartItem.productId))?.priceCents),
         0
     );
 
@@ -92,9 +123,16 @@ function Checkout({ cart, products }) {
                                                     Choose a delivery option:
                                                 </div>
                                                 <div className="delivery-option">
-                                                    <input type="radio" checked
+                                                    <input type="radio"
                                                         className="delivery-option-input"
-                                                        name="delivery-option-1" />
+                                                        name={`delivery-option-${product?.id}`}
+                                                        value="1"
+                                                        onChange={
+                                                            () => {
+                                                                updateDeliveryOption(product?.id, '1');
+                                                            }
+                                                        }
+                                                        checked={cartItem?.deliveryOptionId === '1'} />
                                                     <div>
                                                         <div className="delivery-option-date">
                                                             Tuesday, June 21
@@ -107,7 +145,14 @@ function Checkout({ cart, products }) {
                                                 <div className="delivery-option">
                                                     <input type="radio"
                                                         className="delivery-option-input"
-                                                        name="delivery-option-1" />
+                                                        name={`delivery-option-${product?.id}`}
+                                                        value="2"
+                                                        onChange={
+                                                            () => {
+                                                                updateDeliveryOption(product?.id, '2');
+                                                            }
+                                                        }
+                                                        checked={cartItem?.deliveryOptionId === '2'} />
                                                     <div>
                                                         <div className="delivery-option-date">
                                                             Wednesday, June 15
@@ -120,7 +165,14 @@ function Checkout({ cart, products }) {
                                                 <div className="delivery-option">
                                                     <input type="radio"
                                                         className="delivery-option-input"
-                                                        name="delivery-option-1" />
+                                                        name={`delivery-option-${product?.id}`}
+                                                        value="3"
+                                                        onChange={
+                                                            () => {
+                                                                updateDeliveryOption(product.id, '3');
+                                                            }
+                                                        }
+                                                        checked={cartItem?.deliveryOptionId === '3'} />
                                                     <div>
                                                         <div className="delivery-option-date">
                                                             Monday, June 13
@@ -146,7 +198,6 @@ function Checkout({ cart, products }) {
 
                         <div className="payment-summary-row">
                             <div>Items ({cart.length}):</div>
-                            {console.log(productsPrice)}
                             <div className="payment-summary-money">${formatPriceCents(productsPrice)}</div>
                         </div>
 

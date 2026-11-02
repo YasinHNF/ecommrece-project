@@ -32,7 +32,7 @@ function App() {
   return (
     <Routes>
       <Route index element={<HomePage cart={cart} products={products} />} />
-      <Route path="checkout" element={<Checkout cart={cart} products={products} />} />
+      <Route path="checkout" element={<Checkout cart={cart} setCart={setCart} products={products} />} />
       <Route path="orders" element={<Orders />} />
       <Route path="tracking" element={<Tracking />} />
       <Route path="*" element={<NotFound />} />
