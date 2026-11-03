@@ -31,10 +31,10 @@ function App() {
 
   return (
     <Routes>
-      <Route index element={<HomePage cart={cart} products={products} />} />
+      <Route index element={<HomePage cart={cart} setCart={setCart} products={products} />} />
       <Route path="checkout" element={<Checkout cart={cart} setCart={setCart} products={products} />} />
-      <Route path="orders" element={<Orders />} />
-      <Route path="tracking" element={<Tracking />} />
+      <Route path="orders" element={<Orders cart={cart} />} />
+      <Route path="tracking" element={<Tracking cart={cart} />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   )
