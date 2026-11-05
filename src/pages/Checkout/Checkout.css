@@ -210,10 +210,23 @@
   margin-bottom: 19px;
 }
 
+.checkout-page .place-order-button.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 .checkout-page .reset-button {
-  padding: 5px 15px;
-  gap: 5px;
+  display: flex;
+  overflow: visible;
+  padding: 8px 18px;
+  gap: 10px;
   position: fixed;
   bottom: 5px;
   right: 10px;
+  border-radius: 20px;
+  font-size: 17px;
+}
+
+.reset-button svg {
+  width: 16px;
 }

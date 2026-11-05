@@ -58,30 +58,30 @@ function PaymentSummary({ cart }) {
 
                 <div className="payment-summary-row">
                     <div>Items ({paymentSummary.totalItems}):</div>
-                    <div className="payment-summary-money">${formatPriceCents(paymentSummary.productCostCents)}</div>
+                    <div className="payment-summary-money">${formatPriceCents(paymentSummary.productCostCents) || '0.00'}</div>
                 </div>
 
                 <div className="payment-summary-row">
                     <div>Shipping &amp; handling:</div>
-                    <div className="payment-summary-money">${formatPriceCents(paymentSummary.shippingCostCents || '0.00')}</div>
+                    <div className="payment-summary-money">${formatPriceCents(paymentSummary.shippingCostCents) || '0.00'}</div>
                 </div>
 
                 <div className="payment-summary-row subtotal-row">
                     <div>Total before tax:</div>
-                    <div className="payment-summary-money">${formatPriceCents(paymentSummary.totalCostBeforeTaxCents)}</div>
+                    <div className="payment-summary-money">${formatPriceCents(paymentSummary.totalCostBeforeTaxCents) || '0.00'}</div>
                 </div>
 
                 <div className="payment-summary-row">
                     <div>Estimated tax (10%):</div>
-                    <div className="payment-summary-money">${formatPriceCents(paymentSummary.taxCents)}</div>
+                    <div className="payment-summary-money">${formatPriceCents(paymentSummary.taxCents) || '0.00'}</div>
                 </div>
 
                 <div className="payment-summary-row total-row">
                     <div>Order total:</div>
-                    <div className="payment-summary-money">${formatPriceCents(paymentSummary.totalCostCents)}</div>
+                    <div className="payment-summary-money">${formatPriceCents(paymentSummary.totalCostCents) || '0.00'}</div>
                 </div>
 
-                <button className="place-order-button button-primary">
+                <button className={`place-order-button button-primary ${paymentSummary.totalItems < 1 && 'disabled'}`}>
                     Place your order
                 </button>
             </div>)
@@ -90,7 +90,6 @@ function PaymentSummary({ cart }) {
 
 function ResetCart({ cart, setCart }) {
     function resetCart() {
-        console.log(cart)
         Promise.all(
             cart.map(item => axios.delete(`/api/cart-items/${item.productId}`))
         ).then(
@@ -100,6 +99,7 @@ function ResetCart({ cart, setCart }) {
 
     return (
         <button className="reset-button button-primary" onClick={resetCart}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M135.2 17.7L128 32 32 32C14.3 32 0 46.3 0 64S14.3 96 32 96l384 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-96 0-7.2-14.3C307.4 6.8 296.3 0 284.2 0L163.8 0c-12.1 0-23.2 6.8-28.6 17.7zM416 128L32 128 53.2 467c1.6 25.3 22.6 45 47.9 45l245.8 0c25.3 0 46.3-19.7 47.9-45L416 128z" fill="#FFFFFF"></path></svg>
             Reset
         </button>
     )
@@ -136,14 +136,6 @@ function Checkout({ cart, products, setCart }) {
             getDeliveryOptions();
         }, []
     );
-
-    const productsPrice = cart.reduce(
-        (priceSum, cartItem) => priceSum + (cartItem.quantity * (products.find(productItem => productItem.id === cartItem.productId))?.priceCents),
-        0
-    );
-
-    const shippingPrice = 100; // Just for now
-    const taxPrice = (productsPrice + shippingPrice) * 0.1;
 
     return (
         <>
