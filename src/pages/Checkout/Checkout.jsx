@@ -156,6 +156,47 @@ function Checkout({ cart, products, setCart }) {
         }, []
     );
 
+    const [quantityUpdate, setQuantityUpdate] = useState([]);
+    function setQuantityUpdateToggle(productId) {
+        setQuantityUpdate(prev => prev.map(item => item.productId === productId ? { ...item, updating: !item.updating } : item));
+    }
+
+    useEffect(
+        () => {
+            setQuantityUpdate(prev => cart.map(cartItem => {
+                const matchingQuantityUpdate = prev.find(updateItem => updateItem.productId === cartItem.productId);
+                if (cartItem.productId === matchingQuantityUpdate?.productId) {
+                    return matchingQuantityUpdate
+                }
+
+                return {
+                    productId: cartItem.productId,
+                    updating: false,
+                    inputValue: cartItem.quantity
+                }
+            }));
+        }, [cart]
+    );
+
+    function saveNewQuantity(productId, inputValue) {
+        async function saveToBackend() {
+            try {
+                await axios.put(`/api/cart-items/${productId}`, { quantity: inputValue });
+            } catch (error) {
+                alert(`Error: ${error}. Please try again later.`)
+            }
+        }
+
+        if (inputValue > 999 || inputValue < 1) {
+            alert('Quantity cannot be higher than 999 or lower than 1');
+            return;
+        }
+
+        setCart(prev => prev.map(item => item.productId === productId ? { ...item, quantity: inputValue } : item));
+        setQuantityUpdateToggle(productId);
+        saveToBackend();
+    }
+
     return (
         <>
             <title>Checkout</title>
@@ -173,6 +214,12 @@ function Checkout({ cart, products, setCart }) {
                                     cart.map(
                                         cartItem => {
                                             const product = products.find(productItem => productItem.id === cartItem.productId);
+                                            let quantityUpdateObject;
+
+                                            if (quantityUpdate.length > 1) {
+                                                console.log(quantityUpdate)
+                                                quantityUpdateObject = quantityUpdate.find(item => item.productId === cartItem.productId);
+                                            }
 
                                             return (<div key={cartItem.productId} className="cart-item-container">
                                                 <div className="delivery-date">
@@ -194,11 +241,28 @@ function Checkout({ cart, products, setCart }) {
                                                         </div>
                                                         <div className="product-quantity">
                                                             <span>
-                                                                Quantity: <span className="quantity-label">{cartItem?.quantity}</span>
+                                                                Quantity: <span className="quantity-label">{quantityUpdateObject?.updating ? '' : cartItem?.quantity}</span>
                                                             </span>
-                                                            <span className="update-quantity-link link-primary">
-                                                                Update
-                                                            </span>
+
+                                                            {
+                                                                quantityUpdateObject?.updating ?
+                                                                    <>
+                                                                        <input
+                                                                            type='number'
+                                                                            value={quantityUpdateObject.inputValue}
+                                                                            className="update-quantity-input"
+                                                                            onChange={e => setQuantityUpdate(prev => prev.map(item => item === quantityUpdateObject ? { ...item, inputValue: e.target.value } : item))}
+                                                                        />
+                                                                        <span className="save-quantity-link link-primary" onClick={() => saveNewQuantity(cartItem.productId, Number(quantityUpdateObject.inputValue))}>Save</span>
+                                                                    </>
+
+                                                                    :
+                                                                    <span className="update-quantity-link link-primary">
+                                                                        <span onClick={() => setQuantityUpdateToggle(cartItem.productId, quantityUpdateObject.inputValue)}>Update</span>
+                                                                    </span>
+                                                            }
+
+
                                                             <span className="delete-quantity-link link-primary"
                                                                 onClick={() => deleteCartItem(product.id)}
                                                             >
@@ -283,7 +347,7 @@ function Checkout({ cart, products, setCart }) {
                     <PaymentSummary cart={cart} />
                 </div>
                 <ResetCart cart={cart} setCart={setCart} />
-            </div>
+            </div >
         </>
     )
 }

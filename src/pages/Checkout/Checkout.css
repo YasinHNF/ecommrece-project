@@ -244,3 +244,8 @@
   padding: 8px 15px;
   text-decoration: none;
 }
+
+.checkout-page .update-quantity-input {
+  width: 50px;
+  margin-right: 4px;
+}
