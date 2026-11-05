@@ -146,6 +146,14 @@
   cursor: pointer;
 }
 
+.checkout-grid .delivery-option:hover {
+  opacity: 0.8;
+}
+
+.checkout-grid .delivery-option:active {
+  opacity: 0.6;
+}
+
 .checkout-page .delivery-option-input {
   margin: 3px 5px 0px 0px;
   cursor: pointer;

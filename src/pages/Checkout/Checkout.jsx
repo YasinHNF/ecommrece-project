@@ -131,6 +131,16 @@ function Checkout({ cart, products, setCart }) {
         }
     }
 
+    async function deleteCartItem(productId) {
+        try {
+            await axios.delete(`/api/cart-items/${productId}`);
+            setCart(prev => prev.filter(item => item.productId !== productId));
+
+        } catch (error) {
+            alert(`Error: ${error}`);
+        }
+    }
+
     const [deliveryOptions, setDeliveryOptions] = useState(null);
     const [isLoadingProducts, setIsLoadingProducts] = useState(true);
 
@@ -189,7 +199,9 @@ function Checkout({ cart, products, setCart }) {
                                                             <span className="update-quantity-link link-primary">
                                                                 Update
                                                             </span>
-                                                            <span className="delete-quantity-link link-primary">
+                                                            <span className="delete-quantity-link link-primary"
+                                                                onClick={() => deleteCartItem(product.id)}
+                                                            >
                                                                 Delete
                                                             </span>
                                                         </div>
@@ -199,7 +211,7 @@ function Checkout({ cart, products, setCart }) {
                                                         <div className="delivery-options-title">
                                                             Choose a delivery option:
                                                         </div>
-                                                        <div className="delivery-option">
+                                                        <label className="delivery-option">
                                                             <input type="radio"
                                                                 className="delivery-option-input"
                                                                 name={`delivery-option-${product?.id}`}
@@ -210,7 +222,7 @@ function Checkout({ cart, products, setCart }) {
                                                                     }
                                                                 }
                                                                 checked={cartItem?.deliveryOptionId === '1'} />
-                                                            <div>
+                                                            <div htmlFor={`${product?.id}-1`}>
                                                                 <div className="delivery-option-date">
                                                                     Tuesday, June 21
                                                                 </div>
@@ -218,8 +230,8 @@ function Checkout({ cart, products, setCart }) {
                                                                     FREE Shipping
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                        <div className="delivery-option">
+                                                        </label>
+                                                        <label className="delivery-option">
                                                             <input type="radio"
                                                                 className="delivery-option-input"
                                                                 name={`delivery-option-${product?.id}`}
@@ -238,8 +250,8 @@ function Checkout({ cart, products, setCart }) {
                                                                     $4.99 - Shipping
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                        <div className="delivery-option">
+                                                        </label>
+                                                        <label className="delivery-option">
                                                             <input type="radio"
                                                                 className="delivery-option-input"
                                                                 name={`delivery-option-${product?.id}`}
@@ -258,7 +270,7 @@ function Checkout({ cart, products, setCart }) {
                                                                     $9.99 - Shipping
                                                                 </div>
                                                             </div>
-                                                        </div>
+                                                        </label>
                                                     </div>
                                                 </div>
                                             </div>)
