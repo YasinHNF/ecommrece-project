@@ -88,6 +88,23 @@ function PaymentSummary({ cart }) {
     )
 }
 
+function ResetCart({ cart, setCart }) {
+    function resetCart() {
+        console.log(cart)
+        Promise.all(
+            cart.map(item => axios.delete(`/api/cart-items/${item.productId}`))
+        ).then(
+            () => setCart([])
+        );
+    }
+
+    return (
+        <button className="reset-button button-primary" onClick={resetCart}>
+            Reset
+        </button>
+    )
+}
+
 function Checkout({ cart, products, setCart }) {
     async function updateDeliveryOption(productId, optionId) {
         if (!productId) return
@@ -251,8 +268,8 @@ function Checkout({ cart, products, setCart }) {
 
                     <PaymentSummary cart={cart} />
                 </div>
+                <ResetCart cart={cart} setCart={setCart} />
             </div>
-
         </>
     )
 }

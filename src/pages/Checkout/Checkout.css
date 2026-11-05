@@ -209,3 +209,11 @@
   margin-top: 20px;
   margin-bottom: 19px;
 }
+
+.checkout-page .reset-button {
+  padding: 5px 15px;
+  gap: 5px;
+  position: fixed;
+  bottom: 5px;
+  right: 10px;
+}
