@@ -9,7 +9,7 @@ import lockIcon from '../../assets/images/icons/checkout-lock-icon.png'
 import './Checkout.css'
 import './Checkout-header.css'
 
-function CheckoutHeader({ cartLength }) {
+function CheckoutHeader({ totalItems }) {
     return (
         <div className="checkout-header">
             <div className="header-content">
@@ -22,7 +22,7 @@ function CheckoutHeader({ cartLength }) {
 
                 <div className="checkout-header-middle-section">
                     Checkout (<Link className="return-to-home-link"
-                        to="/">{cartLength} items</Link>)
+                        to="/">{totalItems} items</Link>)
                 </div>
 
                 <div className="checkout-header-right-section">
@@ -33,22 +33,9 @@ function CheckoutHeader({ cartLength }) {
     );
 }
 
-function PaymentSummary({ cart }) {
-    const [paymentSummary, setPaymentSummary] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        async function getPaymentSummary() {
-            const response = await axios.get('/api/payment-summary');
-            setPaymentSummary(response.data);
-            setIsLoading(false);
-        }
-
-        getPaymentSummary();
-    }, [cart]);
-
+function PaymentSummary({ paymentSummary }) {
     return (
-        isLoading ? (
+        Object.keys(paymentSummary) === 0 ? (
             <p>Loading</p>
         ) : (
             <div className="payment-summary">
@@ -161,8 +148,17 @@ function Checkout({ cart, products, setCart }) {
         setQuantityUpdate(prev => prev.map(item => item.productId === productId ? { ...item, updating: !item.updating } : item));
     }
 
+    const [paymentSummary, setPaymentSummary] = useState({});
+
     useEffect(
         () => {
+            async function getPaymentSummary() {
+                const response = await axios.get('/api/payment-summary');
+                setPaymentSummary(response.data);
+            }
+
+            getPaymentSummary();
+
             setQuantityUpdate(prev => cart.map(cartItem => {
                 const matchingQuantityUpdate = prev.find(updateItem => updateItem.productId === cartItem.productId);
                 if (cartItem.productId === matchingQuantityUpdate?.productId) {
@@ -175,8 +171,10 @@ function Checkout({ cart, products, setCart }) {
                     inputValue: cartItem.quantity
                 }
             }));
+
         }, [cart]
     );
+
 
     function saveNewQuantity(productId, inputValue) {
         async function saveToBackend() {
@@ -184,6 +182,7 @@ function Checkout({ cart, products, setCart }) {
                 await axios.put(`/api/cart-items/${productId}`, { quantity: inputValue });
             } catch (error) {
                 alert(`Error: ${error}. Please try again later.`)
+                return;
             }
         }
 
@@ -202,7 +201,7 @@ function Checkout({ cart, products, setCart }) {
             <title>Checkout</title>
             <link rel="icon" type="image/png" href="/images/cart-favicon.png" />
 
-            <CheckoutHeader cartLength={cart.length} />
+            <CheckoutHeader totalItems={paymentSummary.totalItems} />
             <div className="checkout-page">
                 <div className="page-title">Review your order</div>
 
@@ -216,7 +215,7 @@ function Checkout({ cart, products, setCart }) {
                                             const product = products.find(productItem => productItem.id === cartItem.productId);
                                             let quantityUpdateObject;
 
-                                            if (quantityUpdate.length > 1) {
+                                            if (quantityUpdate.length > 0) {
                                                 quantityUpdateObject = quantityUpdate.find(item => item.productId === cartItem.productId);
                                             }
 
@@ -343,7 +342,7 @@ function Checkout({ cart, products, setCart }) {
 
                     </div>
 
-                    <PaymentSummary cart={cart} />
+                    <PaymentSummary paymentSummary={paymentSummary} />
                 </div>
                 <ResetCart cart={cart} setCart={setCart} />
             </div >
