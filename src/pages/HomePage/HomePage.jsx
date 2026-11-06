@@ -13,11 +13,29 @@ function HomePage({ cart, setCart, products }) {
         }, [products]
     );
 
+    const [addedToCartStatus, setAddedToCartStatus] = useState(
+        products.map(productItem => ({ productId: productItem.productId, isShowing: false }))
+    );
+
     function addToCart(productId, quantity) {
-        async function add() {
+        const previousCart = cart;
+
+        setCart(prev => prev.map(
+            cartItem => cartItem.productId === productId ? { ...cartItem, quantity: cartItem.quantity + quantity } : cartItem
+        ));
+
+        async function addToBackend() {
             if (!quantity) return;
 
-            const response = await axios.post('/api/cart-items/', { productId, quantity });
+            let response;
+            try {
+                response = await axios.post('/api/cart-items/', { productId, quantity });
+            } catch (error) {
+                setCart(previousCart);
+                alert(`${error}. Please try again later.`);
+                return;
+            }
+
             const cartItem = cart.find(item => item.productId === response.data.productId);
             if (cartItem) {
                 setCart(
@@ -31,15 +49,13 @@ function HomePage({ cart, setCart, products }) {
             }
 
             setCart(
-                prev => ([
-                    ...prev,
-                    response.data
-                ])
+                prev => [...prev, response.data]
             );
         }
 
-        add();
+        addToBackend();
     }
+
 
     return (
         <>
@@ -94,7 +110,11 @@ function HomePage({ cart, setCart, products }) {
 
                                         <div className="product-spacer"></div>
 
-                                        <div className="added-to-cart">
+                                        <div className={`added-to-cart 
+                                            ${addedToCartStatus.find(
+                                            item => item.productId === productItem.productId
+                                        )?.isShowing ? 'visible' : ''}`
+                                        }>
                                             <img src={checkmark} />
                                             Added
                                         </div>
