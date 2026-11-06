@@ -13,8 +13,6 @@ function HomePage({ cart, setCart, products }) {
         }, [products]
     );
 
-    console.log(productsQuantity)
-
     function addToCart(productId, quantity) {
         async function add() {
             if (!quantity) return;
@@ -22,7 +20,6 @@ function HomePage({ cart, setCart, products }) {
             const response = await axios.post('/api/cart-items/', { productId, quantity });
             const cartItem = cart.find(item => item.productId === response.data.productId);
             if (cartItem) {
-                console.log(response);
                 setCart(
                     prev => prev.map(
                         item => item.productId === cartItem.productId ?

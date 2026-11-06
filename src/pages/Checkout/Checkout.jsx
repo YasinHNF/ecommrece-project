@@ -217,7 +217,6 @@ function Checkout({ cart, products, setCart }) {
                                             let quantityUpdateObject;
 
                                             if (quantityUpdate.length > 1) {
-                                                console.log(quantityUpdate)
                                                 quantityUpdateObject = quantityUpdate.find(item => item.productId === cartItem.productId);
                                             }
 
