@@ -7,24 +7,47 @@ import './HomePage.css'
 
 function HomePage({ cart, setCart, products }) {
     const [productsQuantity, setProductsQuantity] = useState([]);
+    const [addedToCartStatus, setAddedToCartStatus] = useState([]);
+
     useEffect(
         () => {
             setProductsQuantity(products.map(productItem => ({ productId: productItem.id, quantity: 1 })));
+            setAddedToCartStatus(products.map(productItem => ({ productId: productItem.id, isShowing: false })));
         }, [products]
     );
 
-    const [addedToCartStatus, setAddedToCartStatus] = useState(
-        products.map(productItem => ({ productId: productItem.productId, isShowing: false }))
-    );
 
     function addToCart(productId, quantity) {
         const previousCart = cart;
 
-        setCart(prev => prev.map(
-            cartItem => cartItem.productId === productId ? { ...cartItem, quantity: cartItem.quantity + quantity } : cartItem
-        ));
+        const cartItem = cart.find(item => item.productId === productId);
+
+        if (cart.length === 0) {
+            setCart([{
+                productId, quantity, deliveryOptionId: '1'
+            }])
+
+        } else if (cartItem) {
+            setCart(
+                prev => prev.map(item =>
+                    item.productId === productId ? { ...item, quantity: item.quantity + quantity } :
+                        item)
+            );
+        } else {
+            setCart(prev => [...prev, {
+                productId, quantity, deliveryOptionId: '1'
+            }]);
+        }
+
+        setAddedToCartStatus(
+            prev => prev.map(
+                item => item.productId === productId ? { ...item, isShowing: true } : item
+            )
+        );
 
         async function addToBackend() {
+            console.count();
+
             if (!quantity) return;
 
             let response;
@@ -35,25 +58,17 @@ function HomePage({ cart, setCart, products }) {
                 alert(`${error}. Please try again later.`);
                 return;
             }
-
-            const cartItem = cart.find(item => item.productId === response.data.productId);
-            if (cartItem) {
-                setCart(
-                    prev => prev.map(
-                        item => item.productId === cartItem.productId ?
-                            { ...item, quantity: response.data.quantity } :
-                            item
-                    )
-                );
-                return
-            }
-
+            console.log(cart)
             setCart(
-                prev => [...prev, response.data]
+                prev => prev.map(
+                    item => item.productId === productId ?
+                        response.data :
+                        item
+                )
             );
         }
-
         addToBackend();
+
     }
 
 
@@ -112,7 +127,7 @@ function HomePage({ cart, setCart, products }) {
 
                                         <div className={`added-to-cart 
                                             ${addedToCartStatus.find(
-                                            item => item.productId === productItem.productId
+                                            item => item.productId === productItem.id
                                         )?.isShowing ? 'visible' : ''}`
                                         }>
                                             <img src={checkmark} />
