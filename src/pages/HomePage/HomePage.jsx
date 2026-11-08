@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import axios from 'axios'
 import Header from '../../components/Header/Header';
 import { formatPriceCents } from '../../utils/formatPrice.js';
@@ -8,6 +8,7 @@ import './HomePage.css'
 function HomePage({ cart, setCart, products }) {
     const [productsQuantity, setProductsQuantity] = useState([]);
     const [addedToCartStatus, setAddedToCartStatus] = useState([]);
+    const addedToCartTimer = useRef({});
 
     useEffect(
         () => {
@@ -45,9 +46,20 @@ function HomePage({ cart, setCart, products }) {
             )
         );
 
-        async function addToBackend() {
-            console.count();
+        const hideTimer = setTimeout(() => {
+            setAddedToCartStatus(
+                prev => prev.map(item => item.productId === productId ? { ...item, isShowing: false } : item)
+            )
+        }, 2000);
 
+        const timerObject = addedToCartTimer.current[productId];
+
+        if (timerObject) clearTimeout(timerObject);
+
+        addedToCartTimer.current[productId] = hideTimer;
+
+
+        async function addToBackend() {
             if (!quantity) return;
 
             let response;
@@ -58,7 +70,7 @@ function HomePage({ cart, setCart, products }) {
                 alert(`${error}. Please try again later.`);
                 return;
             }
-            console.log(cart)
+
             setCart(
                 prev => prev.map(
                     item => item.productId === productId ?
