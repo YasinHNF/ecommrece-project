@@ -12,7 +12,7 @@ function Header({ cart, search, setSearchParams }) {
         cartItem => cartQuantity += cartItem.quantity
     );
 
-    const [searchText, setSearchText] = useState(search);
+    const [searchText, setSearchText] = useState(!search ? '' : search);
 
     function changeSearch(search) {
         setSearchParams({ search })
