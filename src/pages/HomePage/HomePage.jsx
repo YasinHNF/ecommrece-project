@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useRef } from 'react'
 import { useSearchParams } from 'react-router';
 import axios from 'axios'
 import Header from '../../components/Header/Header';
@@ -6,18 +6,16 @@ import { formatPriceCents } from '../../utils/formatPrice.js';
 import checkmark from '../../assets/images/icons/checkmark.png'
 import './HomePage.css'
 
-function HomePage({ cart, setCart, products }) {
-    const [productsQuantity, setProductsQuantity] = useState([]);
-    const [addedToCartStatus, setAddedToCartStatus] = useState([]);
+function HomePage({
+    cart,
+    setCart,
+    products,
+    productsQuantity,
+    addedToCartStatus,
+    setAddedToCartStatus,
+    setProductsQuantity
+}) {
     const addedToCartTimer = useRef({});
-
-    useEffect(
-        () => {
-            setProductsQuantity(products.map(productItem => ({ productId: productItem.id, quantity: 1 })));
-            setAddedToCartStatus(products.map(productItem => ({ productId: productItem.id, isShowing: false })));
-        }, [products]
-    );
-
 
     function addToCart(productId, quantity) {
         const previousCart = cart;
@@ -167,7 +165,7 @@ function HomePage({ cart, setCart, products }) {
                                         </div>
                                     )
                                 }
-                            ) : <p style={{ margin: '5px' }}>Could not find.</p>
+                            ) : products.length !== 0 ? <p style={{ margin: '5px' }}>Could not find.</p> : ''
                     }
 
                     {

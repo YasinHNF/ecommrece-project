@@ -11,6 +11,9 @@ function App() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
 
+  const [productsQuantity, setProductsQuantity] = useState([]);
+  const [addedToCartStatus, setAddedToCartStatus] = useState([]);
+
   useEffect(
     () => {
       async function getCart() {
@@ -23,6 +26,8 @@ function App() {
       async function getProducts() {
         const response = await axios.get('/api/products');
         setProducts(response.data);
+        setProductsQuantity(response.data.map(productItem => ({ productId: productItem.id, quantity: 1 })));
+        setAddedToCartStatus(response.data.map(productItem => ({ productId: productItem.id, isShowing: false })));
       }
 
       getProducts();
@@ -31,7 +36,17 @@ function App() {
 
   return (
     <Routes>
-      <Route index element={<HomePage cart={cart} setCart={setCart} products={products} />} />
+      <Route index element={
+        <HomePage
+          cart={cart}
+          setCart={setCart}
+          products={products}
+          productsQuantity={productsQuantity}
+          addedToCartStatus={addedToCartStatus}
+          setAddedToCartStatus={setAddedToCartStatus}
+          setProductsQuantity={setProductsQuantity}
+        />}
+      />
       <Route path="checkout" element={<Checkout cart={cart} setCart={setCart} products={products} />} />
       <Route path="orders" element={<Orders cart={cart} />} />
       <Route path="tracking" element={<Tracking cart={cart} />} />
