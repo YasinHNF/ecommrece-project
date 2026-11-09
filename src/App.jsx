@@ -18,7 +18,7 @@ function App() {
     () => {
       async function getCart() {
         const response = await axios.get('/api/cart-items');
-        setCart(response.data);
+        setCart(response.data.map(cartItem => ({ ...cartItem, updating: false, inputValue: cartItem.quantity })));
       }
 
       getCart();

@@ -143,9 +143,8 @@ function Checkout({ cart, products, setCart }) {
         }, []
     );
 
-    const [quantityUpdate, setQuantityUpdate] = useState([]);
-    function setQuantityUpdateToggle(productId) {
-        setQuantityUpdate(prev => prev.map(item => item.productId === productId ? { ...item, updating: !item.updating } : item));
+    function quantityUpdateToggle(productId) {
+        setCart(prev => prev.map(item => item.productId === productId ? { ...item, updating: !item.updating } : item));
     }
 
     const [paymentSummary, setPaymentSummary] = useState({});
@@ -158,20 +157,6 @@ function Checkout({ cart, products, setCart }) {
             }
 
             getPaymentSummary();
-
-            setQuantityUpdate(prev => cart.map(cartItem => {
-                const matchingQuantityUpdate = prev.find(updateItem => updateItem.productId === cartItem.productId);
-                if (cartItem.productId === matchingQuantityUpdate?.productId) {
-                    return matchingQuantityUpdate
-                }
-
-                return {
-                    productId: cartItem.productId,
-                    updating: false,
-                    inputValue: cartItem.quantity
-                }
-            }));
-
         }, [cart]
     );
 
@@ -192,7 +177,7 @@ function Checkout({ cart, products, setCart }) {
         }
 
         setCart(prev => prev.map(item => item.productId === productId ? { ...item, quantity: inputValue } : item));
-        setQuantityUpdateToggle(productId);
+        quantityUpdateToggle(productId);
         saveToBackend();
     }
 
@@ -213,15 +198,12 @@ function Checkout({ cart, products, setCart }) {
                                     cart.map(
                                         cartItem => {
                                             const product = products.find(productItem => productItem.id === cartItem.productId);
-                                            let quantityUpdateObject;
-
-                                            if (quantityUpdate.length > 0) {
-                                                quantityUpdateObject = quantityUpdate.find(item => item.productId === cartItem.productId);
-                                            }
 
                                             return (<div key={cartItem.productId} className="cart-item-container">
                                                 <div className="delivery-date">
-                                                    Delivery date: {dayjs().add((deliveryOptions.find(delOption => delOption.id === cartItem.deliveryOptionId)).deliveryDays, 'days').format('dddd, MMMM DD')}
+                                                    Delivery date: {dayjs().add(
+                                                        (deliveryOptions.find(delOption => delOption.id === cartItem.deliveryOptionId))
+                                                            .deliveryDays, 'days').format('dddd, MMMM DD')}
                                                 </div>
 
                                                 <div className="cart-item-details-grid">
@@ -239,24 +221,28 @@ function Checkout({ cart, products, setCart }) {
                                                         </div>
                                                         <div className="product-quantity">
                                                             <span>
-                                                                Quantity: <span className="quantity-label">{quantityUpdateObject?.updating ? '' : cartItem?.quantity}</span>
+                                                                Quantity: <span className="quantity-label">{cartItem?.updating ? '' : cartItem?.quantity}</span>
                                                             </span>
 
                                                             {
-                                                                quantityUpdateObject?.updating ?
+                                                                cartItem?.updating ?
                                                                     <>
                                                                         <input
                                                                             type='number'
-                                                                            value={quantityUpdateObject.inputValue}
+                                                                            value={cartItem.inputValue}
                                                                             className="update-quantity-input"
-                                                                            onChange={e => setQuantityUpdate(prev => prev.map(item => item === quantityUpdateObject ? { ...item, inputValue: e.target.value } : item))}
+                                                                            onChange={e => setCart(prev =>
+                                                                                prev.map(item => item.productId === cartItem.productId ?
+                                                                                    { ...item, inputValue: e.target.value } : item))}
+                                                                            onKeyDown={e => e.key === 'Enter' && saveNewQuantity(cartItem.productId, Number(cartItem.inputValue))}
                                                                         />
-                                                                        <span className="save-quantity-link link-primary" onClick={() => saveNewQuantity(cartItem.productId, Number(quantityUpdateObject.inputValue))}>Save</span>
+                                                                        <span className="save-quantity-link link-primary" onClick={() =>
+                                                                            saveNewQuantity(cartItem.productId, Number(cartItem.inputValue))}>Save</span>
                                                                     </>
 
                                                                     :
                                                                     <span className="update-quantity-link link-primary">
-                                                                        <span onClick={() => setQuantityUpdateToggle(cartItem.productId, quantityUpdateObject.inputValue)}>Update</span>
+                                                                        <span onClick={() => quantityUpdateToggle(cartItem.productId)}>Update</span>
                                                                     </span>
                                                             }
 

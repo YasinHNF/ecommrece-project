@@ -22,20 +22,16 @@ function HomePage({
 
         const cartItem = cart.find(item => item.productId === productId);
 
-        if (cart.length === 0) {
-            setCart([{
-                productId, quantity, deliveryOptionId: '1'
-            }])
-
-        } else if (cartItem) {
+        if (cartItem) {
             setCart(
                 prev => prev.map(item =>
                     item.productId === productId ? { ...item, quantity: item.quantity + quantity } :
                         item)
             );
+
         } else {
             setCart(prev => [...prev, {
-                productId, quantity, deliveryOptionId: '1'
+                productId, quantity, deliveryOptionId: '1', updating: false, inputValue: quantity
             }]);
         }
 
@@ -73,7 +69,7 @@ function HomePage({
             setCart(
                 prev => prev.map(
                     item => item.productId === productId ?
-                        response.data :
+                        { ...response.data, updating: false, inputValue: response.data.quantity } :
                         item
                 )
             );
