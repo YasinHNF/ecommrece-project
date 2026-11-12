@@ -35,11 +35,12 @@ function Orders({ cart, addToCart, products }) {
 
     function buyAgainProduct(productId, orderId) {
         addToCart(productId, 1);
-
-        setOrders(prev => prev.map(item => {
-            const newProducts = item.products.map(item =>
-                item.productId === productId ? { ...item, isAdding: true } : item);
-            return { ...item, products: newProducts }
+        
+        setOrders(prev => prev.map(orderItem => {
+            const newProducts = orderItem.products.map(item =>
+                orderId === orderItem.id && item.productId === productId ? { ...item, isAdding: true } : item);
+            console.lo
+            return { ...orderItem, products: newProducts }
         }));
 
         timersRef.current[orderId] ??= {};
@@ -52,6 +53,7 @@ function Orders({ cart, addToCart, products }) {
                 return { ...item, products: newProducts }
             }));
         }, 2000);
+
     }
 
     return (
@@ -59,7 +61,7 @@ function Orders({ cart, addToCart, products }) {
             <title>Orders</title>
             <link rel="icon" type="image/png" href="/images/orders-favicon.png" />
 
-            <Header cart={cart}  />
+            <Header cart={cart} />
             <div className="orders-page">
                 <div className="page-title">Your Orders</div>
 
