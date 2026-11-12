@@ -33,21 +33,28 @@ function CheckoutHeader({ totalItems }) {
     );
 }
 
-function PaymentSummary({ paymentSummary, setCart }) {
+function PaymentSummary({
+    paymentSummary,
+    setCart,
+    isPaymentButtonActive,
+    setIsPaymentButtonActive
+}) {
     const navigate = useNavigate();
-    const [buttonActive, setButtonActive] = useState(true);
 
     async function placeOrder() {
-        setButtonActive(false);
+        setIsPaymentButtonActive(false);
         try {
             await axios.post('/api/orders');
             setCart([]);
             navigate('/orders');
         } catch (error) {
             alert(error);
-            setButtonActive(true);
+            if (!isPaymentButtonActive) return;
+            setIsPaymentButtonActive(true);
         }
     }
+
+    console.log(isPaymentButtonActive)
 
     return (
         Object.keys(paymentSummary) === 0 ? (
@@ -86,7 +93,7 @@ function PaymentSummary({ paymentSummary, setCart }) {
                 <button
                     className="place-order-button button-primary"
                     onClick={placeOrder}
-                    disabled={!buttonActive && 'disabled'}
+                    disabled={!isPaymentButtonActive && 'disabled'}
                 >
                     Place your order
                 </button>
@@ -120,7 +127,7 @@ function CartEmpty() {
     )
 }
 
-function Checkout({ cart, products, setCart }) {
+function Checkout({ cart, products, setCart, isPaymentButtonActive, setIsPaymentButtonActive }) {
     async function updateDeliveryOption(productId, optionId) {
         if (!productId) return
 
@@ -205,7 +212,8 @@ function Checkout({ cart, products, setCart }) {
             <title>Checkout</title>
             <link rel="icon" type="image/png" href="/images/cart-favicon.png" />
 
-            <CheckoutHeader totalItems={paymentSummary.totalItems} />
+            <CheckoutHeader
+                totalItems={paymentSummary.totalItems} setcart={setCart} cart={cart} />
             <div className="checkout-page">
                 <div className="page-title">Review your order</div>
 
@@ -347,7 +355,12 @@ function Checkout({ cart, products, setCart }) {
 
                     </div>
 
-                    <PaymentSummary paymentSummary={paymentSummary} setCart={setCart} />
+                    <PaymentSummary
+                        paymentSummary={paymentSummary}
+                        setCart={setCart}
+                        isPaymentButtonActive={isPaymentButtonActive}
+                        setIsPaymentButtonActive={setIsPaymentButtonActive}
+                    />
                 </div>
                 <ResetCart cart={cart} setCart={setCart} />
             </div >
