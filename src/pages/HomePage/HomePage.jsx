@@ -15,15 +15,18 @@ function HomePage({
     const [searchParams, setSearchParams] = useSearchParams();
     const search = searchParams.get('search');
 
-    const filteredProducts = products.map(
-        (productItem) => {
-            if (!search) return productItem;
+    let filteredProducts = [];
 
-            if (productItem.name.toLowerCase().includes(search.toLowerCase()) ||
-                productItem.keywords.find(kw => kw.includes(search.toLowerCase())))
-                return productItem;
+    for (const productItem of products) {
+        if (!search) {
+            filteredProducts = products;
+            break;
         }
-    );
+
+        if (productItem.name.toLowerCase().includes(search.toLowerCase()) ||
+            productItem.keywords.find(kw => kw.includes(search.toLowerCase())))
+            filteredProducts.push(productItem);
+    }
 
     return (
         <>
