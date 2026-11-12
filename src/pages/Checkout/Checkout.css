@@ -218,7 +218,7 @@
   margin-bottom: 19px;
 }
 
-.checkout-page .place-order-button.disabled {
+.checkout-page .place-order-button[disabled] {
   opacity: 0.5;
   pointer-events: none;
 }

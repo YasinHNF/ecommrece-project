@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import axios from 'axios'
 import dayjs from 'dayjs'
 import { formatPriceCents } from '../../utils/formatPrice.js'
@@ -33,7 +33,22 @@ function CheckoutHeader({ totalItems }) {
     );
 }
 
-function PaymentSummary({ paymentSummary }) {
+function PaymentSummary({ paymentSummary, setCart }) {
+    const navigate = useNavigate();
+    const [buttonActive, setButtonActive] = useState(true);
+
+    async function placeOrder() {
+        setButtonActive(false);
+        try {
+            await axios.post('/api/orders');
+            setCart([]);
+            navigate('/orders');
+        } catch (error) {
+            alert(error);
+            setButtonActive(true);
+        }
+    }
+
     return (
         Object.keys(paymentSummary) === 0 ? (
             <p>Loading</p>
@@ -68,7 +83,11 @@ function PaymentSummary({ paymentSummary }) {
                     <div className="payment-summary-money">${formatPriceCents(paymentSummary.totalCostCents) || '0.00'}</div>
                 </div>
 
-                <button className={`place-order-button button-primary ${paymentSummary.totalItems < 1 && 'disabled'}`}>
+                <button
+                    className="place-order-button button-primary"
+                    onClick={placeOrder}
+                    disabled={!buttonActive && 'disabled'}
+                >
                     Place your order
                 </button>
             </div>)
@@ -328,7 +347,7 @@ function Checkout({ cart, products, setCart }) {
 
                     </div>
 
-                    <PaymentSummary paymentSummary={paymentSummary} />
+                    <PaymentSummary paymentSummary={paymentSummary} setCart={setCart} />
                 </div>
                 <ResetCart cart={cart} setCart={setCart} />
             </div >
