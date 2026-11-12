@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { NavLink } from 'react-router'
+import { useNavigate, NavLink } from 'react-router'
 import logoWhite from '../../assets/images/logo-white.png'
 import mobileLogoWhite from '../../assets/images/mobile-logo-white.png'
 import cartIcon from '../../assets/images/icons/cart-icon.png'
@@ -14,8 +14,14 @@ function Header({ cart, search, setSearchParams }) {
 
     const [searchText, setSearchText] = useState(!search ? '' : search);
 
+    const navigate = useNavigate();
+
     function changeSearch(search) {
-        setSearchParams({ search })
+        if (location.pathname !== '/') {
+            navigate(`/?search=${search}`);
+            return;
+        }
+        setSearchParams({ search });
     }
 
     return (
