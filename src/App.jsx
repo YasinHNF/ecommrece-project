@@ -125,61 +125,40 @@ function App() {
         }, []
     );
 
+    const sharedProps = {
+        cart,
+        setCart,
+        products,
+        productsQuantity,
+        setProductsQuantity,
+        addedToCartStatus,
+        setAddedToCartStatus,
+        isPaymentButtonActive,
+        setIsPaymentButtonActive,
+        getOrders,
+        paymentSummary,
+        setPaymentSummary,
+        addToCart,
+        orders,
+        setOrders
+    }; // Pass this to every component, each takes only the ones it needs
+
     return (
         <>
             <Routes>
-                <Route index element={
-                    <HomePage
-                        cart={cart}
-                        setCart={setCart}
-                        products={products}
-                        productsQuantity={productsQuantity}
-                        addedToCartStatus={addedToCartStatus}
-                        setAddedToCartStatus={setAddedToCartStatus}
-                        setProductsQuantity={setProductsQuantity}
-                        addToCart={addToCart}
-                    />}
+                <Route index element={<HomePage {...sharedProps} />}
                 />
-                <Route path="checkout" element={
-                    <Checkout
-                        cart={cart}
-                        setCart={setCart}
-                        products={products}
-                        isPaymentButtonActive={isPaymentButtonActive}
-                        setIsPaymentButtonActive={setIsPaymentButtonActive}
-                        getOrders={getOrders}
-                        paymentSummary={paymentSummary}
-                        setPaymentSummary={setPaymentSummary}
-                    />}
+                <Route path="checkout" element={<Checkout {...sharedProps} />}
                 />
                 <Route path="orders" element={
-                    <Orders
-                        cart={cart}
-                        setCart={setCart}
-                        products={products}
-                        addToCart={addToCart}
-                        orders={orders}
-                        setOrders={setOrders}
-                        getOrders={getOrders}
-                    />}
+                    <Orders {...sharedProps} />}
                 />
                 <Route path="tracking" element={
-                    <Tracking
-                        cart={cart}
-                        orders={orders}
-                        getOrders={getOrders}
-                        products={products}
-                    />}
+                    <Tracking {...sharedProps} />}
                 />
-                <Route path="*" element={<NotFound cart={cart} />} />
+                <Route path="*" element={<NotFound {...sharedProps} />} />
             </Routes>
-            <ResetApp
-                setCart={setCart}
-                setOrders={setOrders}
-                setPaymentSummary={setPaymentSummary}
-                setIsPaymentButtonActive={setIsPaymentButtonActive}
-                
-            />
+            <ResetApp {...sharedProps} />
         </>
     )
 }
