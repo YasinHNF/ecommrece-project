@@ -6,6 +6,7 @@ import Checkout from './pages/Checkout/Checkout'
 import Orders from './pages/Orders/Orders'
 import Tracking from './pages/Tracking/Tracking'
 import NotFound from './pages/NotFound/NotFound'
+import ResetApp from './components/ResetApp/ResetApp'
 
 function App() {
     const [products, setProducts] = useState([]);
@@ -13,6 +14,9 @@ function App() {
     const [productsQuantity, setProductsQuantity] = useState([]);
     const [addedToCartStatus, setAddedToCartStatus] = useState([]);
     const [isPaymentButtonActive, setIsPaymentButtonActive] = useState(false);
+    const [orders, setOrders] = useState([]);
+    const [paymentSummary, setPaymentSummary] = useState({});
+
 
     const addedToCartTimer = useRef({});
     function addToCart(productId, quantity) {
@@ -32,6 +36,7 @@ function App() {
                 productId, quantity, deliveryOptionId: '1', updating: false, inputValue: quantity
             }]);
         }
+        setIsPaymentButtonActive(true);
 
         setAddedToCartStatus(
             prev => prev.map(
@@ -76,6 +81,23 @@ function App() {
 
     }
 
+    async function getOrders() {
+        let response;
+        try {
+            response = await axios.get('/api/orders');
+            const newOrders = response.data.map(
+                item => {
+                    const newProducts = item.products.map(item => ({ ...item, isAdding: false }));
+                    return { ...item, products: newProducts }
+                }
+            );
+            response.data.length !== 0 ? setOrders(newOrders) :
+                setOrders(['empty']);
+        } catch (error) {
+            alert(error);
+        }
+    }
+
     useEffect(
         () => {
             async function getCart() {
@@ -94,43 +116,71 @@ function App() {
             }
 
             getProducts();
+
+            async function firstGetOrders() {
+                await getOrders(); // React 19 rule
+            }
+
+            firstGetOrders();
         }, []
     );
 
     return (
-        <Routes>
-            <Route index element={
-                <HomePage
-                    cart={cart}
-                    setCart={setCart}
-                    products={products}
-                    productsQuantity={productsQuantity}
-                    addedToCartStatus={addedToCartStatus}
-                    setAddedToCartStatus={setAddedToCartStatus}
-                    setProductsQuantity={setProductsQuantity}
-                    addToCart={addToCart}
-                />}
+        <>
+            <Routes>
+                <Route index element={
+                    <HomePage
+                        cart={cart}
+                        setCart={setCart}
+                        products={products}
+                        productsQuantity={productsQuantity}
+                        addedToCartStatus={addedToCartStatus}
+                        setAddedToCartStatus={setAddedToCartStatus}
+                        setProductsQuantity={setProductsQuantity}
+                        addToCart={addToCart}
+                    />}
+                />
+                <Route path="checkout" element={
+                    <Checkout
+                        cart={cart}
+                        setCart={setCart}
+                        products={products}
+                        isPaymentButtonActive={isPaymentButtonActive}
+                        setIsPaymentButtonActive={setIsPaymentButtonActive}
+                        getOrders={getOrders}
+                        paymentSummary={paymentSummary}
+                        setPaymentSummary={setPaymentSummary}
+                    />}
+                />
+                <Route path="orders" element={
+                    <Orders
+                        cart={cart}
+                        setCart={setCart}
+                        products={products}
+                        addToCart={addToCart}
+                        orders={orders}
+                        setOrders={setOrders}
+                        getOrders={getOrders}
+                    />}
+                />
+                <Route path="tracking" element={
+                    <Tracking
+                        cart={cart}
+                        orders={orders}
+                        getOrders={getOrders}
+                        products={products}
+                    />}
+                />
+                <Route path="*" element={<NotFound cart={cart} />} />
+            </Routes>
+            <ResetApp
+                setCart={setCart}
+                setOrders={setOrders}
+                setPaymentSummary={setPaymentSummary}
+                setIsPaymentButtonActive={setIsPaymentButtonActive}
+                
             />
-            <Route path="checkout" element={
-                <Checkout
-                    cart={cart}
-                    setCart={setCart}
-                    products={products}
-                    isPaymentButtonActive={isPaymentButtonActive}
-                    setIsPaymentButtonActive={setIsPaymentButtonActive}
-                />}
-            />
-            <Route path="orders" element={
-                <Orders
-                    cart={cart}
-                    setCart={setCart}
-                    products={products}
-                    addToCart={addToCart}
-                />}
-            />
-            <Route path="tracking" element={<Tracking cart={cart} />} />
-            <Route path="*" element={<NotFound />} />
-        </Routes>
+        </>
     )
 }
 

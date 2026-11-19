@@ -37,7 +37,8 @@ function PaymentSummary({
     paymentSummary,
     setCart,
     isPaymentButtonActive,
-    setIsPaymentButtonActive
+    setIsPaymentButtonActive,
+    getOrders
 }) {
     const navigate = useNavigate();
 
@@ -46,6 +47,7 @@ function PaymentSummary({
         try {
             await axios.post('/api/orders');
             setCart([]);
+            getOrders();
             navigate('/orders');
         } catch (error) {
             alert(error);
@@ -53,8 +55,6 @@ function PaymentSummary({
             setIsPaymentButtonActive(true);
         }
     }
-
-    console.log(isPaymentButtonActive)
 
     return (
         Object.keys(paymentSummary) === 0 ? (
@@ -101,23 +101,6 @@ function PaymentSummary({
     )
 }
 
-function ResetCart({ cart, setCart }) {
-    function resetCart() {
-        Promise.all(
-            cart.map(item => axios.delete(`/api/cart-items/${item.productId}`))
-        ).then(
-            () => setCart([])
-        );
-    }
-
-    return (
-        <button className="reset-button button-primary" onClick={resetCart}>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M135.2 17.7L128 32 32 32C14.3 32 0 46.3 0 64S14.3 96 32 96l384 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-96 0-7.2-14.3C307.4 6.8 296.3 0 284.2 0L163.8 0c-12.1 0-23.2 6.8-28.6 17.7zM416 128L32 128 53.2 467c1.6 25.3 22.6 45 47.9 45l245.8 0c25.3 0 46.3-19.7 47.9-45L416 128z" fill="#FFFFFF"></path></svg>
-            Delete all
-        </button>
-    )
-}
-
 function CartEmpty() {
     return (
         <div>
@@ -127,7 +110,15 @@ function CartEmpty() {
     )
 }
 
-function Checkout({ cart, products, setCart, isPaymentButtonActive, setIsPaymentButtonActive }) {
+function Checkout({
+    paymentSummary,
+    setPaymentSummary,
+    cart,
+    products,
+    setCart,
+    isPaymentButtonActive,
+    setIsPaymentButtonActive,
+    getOrders }) {
     async function updateDeliveryOption(productId, optionId) {
         if (!productId) return
 
@@ -147,7 +138,9 @@ function Checkout({ cart, products, setCart, isPaymentButtonActive, setIsPayment
     async function deleteCartItem(productId) {
         try {
             await axios.delete(`/api/cart-items/${productId}`);
-            setCart(prev => prev.filter(item => item.productId !== productId));
+            const newCart = cart.filter(item => item.productId !== productId);
+            setCart(newCart);
+            if (newCart.length === 0) setIsPaymentButtonActive(false);
 
         } catch (error) {
             alert(`Error: ${error}`);
@@ -173,7 +166,6 @@ function Checkout({ cart, products, setCart, isPaymentButtonActive, setIsPayment
         setCart(prev => prev.map(item => item.productId === productId ? { ...item, updating: !item.updating } : item));
     }
 
-    const [paymentSummary, setPaymentSummary] = useState({});
 
     useEffect(
         () => {
@@ -360,9 +352,9 @@ function Checkout({ cart, products, setCart, isPaymentButtonActive, setIsPayment
                         setCart={setCart}
                         isPaymentButtonActive={isPaymentButtonActive}
                         setIsPaymentButtonActive={setIsPaymentButtonActive}
+                        getOrders={getOrders}
                     />
                 </div>
-                <ResetCart cart={cart} setCart={setCart} />
             </div >
         </>
     )

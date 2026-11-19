@@ -223,21 +223,6 @@
   pointer-events: none;
 }
 
-.checkout-page .reset-button {
-  display: flex;
-  padding: 8px 18px;
-  gap: 10px;
-  position: fixed;
-  bottom: 5px;
-  right: 10px;
-  border-radius: 20px;
-  font-size: 17px;
-}
-
-.checkout-page .reset-button svg {
-  width: 16px;
-}
-
 .checkout-page .view-products-link {
   display: inline-block;
   margin-top: 10px;

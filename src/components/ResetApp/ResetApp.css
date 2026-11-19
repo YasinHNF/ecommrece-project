@@ -1,0 +1,14 @@
+.reset-button {
+  display: flex;
+  padding: 8px 18px;
+  gap: 10px;
+  position: fixed;
+  bottom: 5px;
+  right: 10px;
+  border-radius: 20px;
+  font-size: 17px;
+}
+
+.reset-button svg {
+  width: 17px;
+}
